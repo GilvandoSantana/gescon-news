@@ -39,14 +39,16 @@ const at = await token();
 // Playlist do dia: reaproveita se já existir (nova execução do mesmo dia não duplica).
 const minhas = await api(at, "playlists?part=snippet&mine=true&maxResults=50");
 let playlist = minhas.items.find((p) => p.snippet.title === titulo);
-if (!playlist) {
+if (playlist) {
+  const itens = await api(at, `playlistItems?part=id&playlistId=${playlist.id}&maxResults=1`);
+  if (itens.items.length > 0) { console.log(`Playlist ${playlist.id} já tem o vídeo de ${dia}. Nada a fazer.`); process.exit(0); }
+} else {
   playlist = await api(at, "playlists?part=snippet,status", {
     method: "POST",
     body: JSON.stringify({ snippet: { title: titulo, description: descricao }, status: { privacyStatus: "unlisted" } }),
   });
+  console.log(`Playlist criada: ${playlist.id}`);
 }
-const itens = await api(at, `playlistItems?part=id&playlistId=${playlist.id}&maxResults=1`);
-if (itens.items.length > 0) { console.log(`Playlist ${playlist.id} já tem o vídeo de ${dia}. Nada a fazer.`); process.exit(0); }
 
 // Envio do vídeo (resumable).
 const { size } = await stat(arquivo);
@@ -63,9 +65,18 @@ const up = await fetch(ini.headers.get("location"), { method: "PUT", headers: { 
 const video = await up.json();
 if (!up.ok) throw new Error(`Envio falhou: ${JSON.stringify(video)}`);
 
-await api(at, "playlistItems?part=snippet", {
-  method: "POST",
-  body: JSON.stringify({ snippet: { playlistId: playlist.id, resourceId: { kind: "youtube#video", videoId: video.id } } }),
-});
+for (let t = 1; t <= 5; t++) {
+  try {
+    await api(at, "playlistItems?part=snippet", {
+      method: "POST",
+      body: JSON.stringify({ snippet: { playlistId: playlist.id, resourceId: { kind: "youtube#video", videoId: video.id } } }),
+    });
+    break;
+  } catch (e) {
+    if (t === 5) throw e;
+    console.warn(`Tentativa ${t} de pôr na playlist falhou; aguardando...`);
+    await new Promise((r) => setTimeout(r, 10000 * t));
+  }
+}
 console.log(`Vídeo https://youtu.be/${video.id}`);
 console.log(`Playlist https://www.youtube.com/playlist?list=${playlist.id}`);
