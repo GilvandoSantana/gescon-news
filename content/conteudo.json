@@ -1,0 +1,302 @@
+{
+  "dds": {
+    "2026-11-23": {
+      "tema": "PARADA DE MANUTENÇÃO: principais desvios e como evitá-los",
+      "pontos": [
+        "Isole e sinalize a área antes de começar. Sem isolamento, não inicia.",
+        "Avalie os riscos de verdade ao preencher a ARA e os checklists. Nada de preencher no automático.",
+        "Bloqueio: cada executante coloca o seu cadeado na caixa de bloqueio.",
+        "Máscara exige rosto limpo: barba grande não veda. Faça a barba antes da atividade.",
+        "Use todos os EPIs da atividade. Nenhum é opcional.",
+        "Andaime só se estiver aterrado. Confira antes de subir.",
+        "Altura: cada equipe envia 10% dos integrantes à avaliação de saúde (amostragem)."
+      ],
+      "certo": [
+        "Isolar e sinalizar a área antes de iniciar",
+        "Avaliar os riscos de fato ao preencher a ARA e os checklists",
+        "Colocar o seu cadeado na caixa de bloqueio",
+        "Barba feita para usar a máscara com vedação",
+        "Usar todos os EPIs da atividade, inclusive o abafador",
+        "Subir somente em andaime aterrado e liberado",
+        "Enviar 10% da equipe à avaliação de saúde (amostragem)"
+      ],
+      "errado": [
+        "Trabalhar sem isolamento e sinalização",
+        "Preencher a ARA e os checklists no automático",
+        "Deixar de colocar o cadeado na caixa de bloqueio",
+        "Usar máscara com barba grande",
+        "Dispensar o EPI, como o abafador, por achar rápido",
+        "Subir em andaime sem aterramento",
+        "Equipe de altura sem enviar os 10% à avaliação de saúde"
+      ],
+      "pare": {
+        "pergunta": "Isolei a área, avaliei os riscos e coloquei o <em>meu cadeado</em>?",
+        "sub": "EPIs completos e andaime aterrado? Se faltar algo, não começa."
+      }
+    },
+    "2026-11-24": {
+      "tema": "Comunicação entre equipes",
+      "pontos": [
+        "Confirme se as informações transmitidas foram compreendidas.",
+        "Não presuma que outras equipes já estão cientes da sua atividade.",
+        "Use corretamente rádios, reuniões e comunicação direta.",
+        "Alinhe atividades simultâneas para evitar interferências e riscos.",
+        "Comunique antes de movimentar equipamentos, cargas ou iniciar intervenções.",
+        "Em dúvida ou falha de comunicação, pare a atividade e esclareça a situação.",
+        "Mantenha comunicação respeitosa, objetiva e contínua durante todo o trabalho."
+      ],
+      "certo": [
+        "Comunicar às outras equipes antes de iniciar uma atividade que possa interferir no trabalho delas",
+        "Confirmar se todos compreenderam as orientações",
+        "Informar imediatamente sobre mudanças, riscos e desvios",
+        "Utilizar rádio e comunicação direta de forma clara e objetiva"
+      ],
+      "errado": [
+        "Iniciar uma atividade sem informar as equipes próximas",
+        "Presumir que todos já sabem o que será realizado",
+        "Ignorar informações importantes sobre riscos",
+        "Realizar atividades simultâneas sem alinhamento entre as equipes",
+        "Não comunicar alterações no serviço ou nas condições da área"
+      ],
+      "pare": {
+        "pergunta": "Todos ao meu redor sabem o que eu vou <em>fazer</em>?",
+        "sub": "Na dúvida ou falha de comunicação, pare a atividade e esclareça."
+      }
+    },
+    "2026-11-25": {
+      "tema": "Ancoragem de cinto de segurança: pode salvar vidas",
+      "pontos": [
+        "Escolha um ponto de ancoragem resistente, definido na análise de risco.",
+        "Inspecione cinto, talabarte e conectores antes de cada uso.",
+        "Permaneça 100% conectado durante todo o deslocamento."
+      ],
+      "certo": [
+        "Ancorar em ponto definido na ARA",
+        "Usar talabarte com absorvedor de energia",
+        "Manter-se conectado em todo o deslocamento"
+      ],
+      "errado": [
+        "Ancorar em estrutura sem resistência confirmada",
+        "Usar cinto ou talabarte danificado",
+        "Soltar-se “só por um instante”"
+      ],
+      "pare": {
+        "pergunta": "Estou ancorado em um ponto <em>seguro</em>?",
+        "sub": "A ancoragem correta pode salvar a sua vida."
+      }
+    },
+    "2026-11-26": {
+      "tema": "Água, a melhor fonte de hidratação",
+      "pontos": [
+        "Beba água ao longo do turno, sem esperar sentir sede.",
+        "Prefira água a refrigerantes e bebidas energéticas.",
+        "No calor intenso, faça pausas na sombra e redobre a hidratação."
+      ],
+      "certo": [
+        "Beber água regularmente durante o dia",
+        "Usar as pausas e os pontos de hidratação",
+        "Avisar a liderança se um colega passar mal"
+      ],
+      "errado": [
+        "Esperar sentir sede para beber",
+        "Trocar a água por refrigerante ou energético",
+        "Ignorar tontura, dor de cabeça ou cãibras"
+      ],
+      "pare": {
+        "pergunta": "Quando foi a última vez que eu bebi <em>água</em>?",
+        "sub": "Hidratar-se previne mal-estar e acidente."
+      }
+    },
+    "2026-11-27": {
+      "tema": "Como efetuar o bloqueio e etiquetagem corretamente",
+      "pontos": [
+        "Identifique e desligue todas as fontes de energia do equipamento.",
+        "Aplique o seu cadeado e a sua etiqueta pessoal.",
+        "Confirme a energia zero antes de iniciar o serviço."
+      ],
+      "certo": [
+        "Cada trabalhador aplica o seu cadeado e etiqueta",
+        "Testar e confirmar a energia zero antes de iniciar",
+        "Só quem bloqueou retira o seu bloqueio"
+      ],
+      "errado": [
+        "Confiar só no desligamento, sem bloquear",
+        "Usar cadeado ou etiqueta de outra pessoa",
+        "Retirar o bloqueio de um colega"
+      ],
+      "pare": {
+        "pergunta": "Eu confirmei a energia <em>zero</em> antes de começar?",
+        "sub": "Bloqueou, etiquetou, testou. Só então trabalhe."
+      }
+    },
+    "2026-11-28": {
+      "tema": "Manuseio de carga manual",
+      "pontos": [
+        "Avalie o peso e o formato; se for pesado, peça ajuda ou use equipamento.",
+        "Dobre os joelhos, mantenha a coluna reta e a carga junto ao corpo.",
+        "Confira se o caminho está livre antes de se deslocar."
+      ],
+      "certo": [
+        "Dobrar os joelhos e manter a coluna reta",
+        "Dividir a carga ou pedir ajuda",
+        "Usar carrinho ou talha quando possível"
+      ],
+      "errado": [
+        "Levantar peso curvando as costas",
+        "Girar o tronco com a carga nas mãos",
+        "Carregar carga que atrapalha a visão do caminho"
+      ],
+      "pare": {
+        "pergunta": "Essa carga é leve o bastante para eu levantar <em>sozinho</em>?",
+        "sub": "Peça ajuda. A sua coluna agradece."
+      }
+    },
+    "2026-11-29": {
+      "tema": "Cuidados com a saúde física e mental",
+      "pontos": [
+        "Respeite o descanso: durma bem e faça as pausas.",
+        "Mantenha alimentação equilibrada e hidratação.",
+        "Sobrecarregado ou com desconforto? Fale com a liderança ou procure o ambulatório."
+      ],
+      "certo": [
+        "Fazer pausas e dormir bem",
+        "Conversar com alguém de confiança sobre o que incomoda",
+        "Procurar o ambulatório ao sentir dor ou desconforto"
+      ],
+      "errado": [
+        "Ignorar sinais de cansaço extremo",
+        "Esconder dor ou mal-estar para não parar o serviço",
+        "Trabalhar longos períodos sem descanso"
+      ],
+      "pare": {
+        "pergunta": "Eu e meus colegas estamos <em>bem</em> hoje?",
+        "sub": "Cuidar da saúde também é segurança."
+      }
+    }
+  },
+  "regrasOuro": [
+    {
+      "n": 1,
+      "t": "Uniforme",
+      "d": "Uniforme com identificação da empresa, calça e camisa com faixa refletiva. Manga longa não dobrada e camisa por dentro da calça."
+    },
+    {
+      "n": 2,
+      "t": "Adornos",
+      "d": "Proibido o uso de adornos como anéis, correntes, pulseiras, relógios e brincos."
+    },
+    {
+      "n": 3,
+      "t": "Óculos",
+      "d": "Proibido óculos escuro, exceto soldadores e caldeireiros no corte/solda. Nas demais atividades, óculos de impacto transparente. Outros só com ARA e aprovação do TST."
+    },
+    {
+      "n": 4,
+      "t": "Barba",
+      "d": "Onde a máscara é obrigatória, só barba dentro dos padrões dos folders das áreas."
+    },
+    {
+      "n": 5,
+      "t": "Celular na área",
+      "d": "Proibido celular nas áreas operacionais (inclusive fotos e vídeos), exceto autorizados com crachá. Na área administrativa, não use andando."
+    },
+    {
+      "n": 6,
+      "t": "Bota antitorção",
+      "d": "Bota de cano alto antitorção, com metatarso e cadarço amarrado até o último furo. Em área administrativa e deslocamentos, cano longo sem metatarso."
+    },
+    {
+      "n": 7,
+      "t": "Luva impacto",
+      "d": "Luvas anti-impacto em qualquer área operacional, mesmo só circulando."
+    },
+    {
+      "n": 8,
+      "t": "Capacete",
+      "d": "Capacete com jugular e protetor auricular bem ajustados na área operacional e nas oficinas."
+    },
+    {
+      "n": 9,
+      "t": "Medidas de controle",
+      "d": "Cumpra as medidas de controle das análises de risco e das permissões de trabalho."
+    },
+    {
+      "n": 10,
+      "t": "Ferramentas",
+      "d": "Só ferramentas autorizadas e inspecionadas. Proteção obrigatória para alavancas, martelos e marretas."
+    },
+    {
+      "n": 11,
+      "t": "Fumar",
+      "d": "Proibido fumar nas áreas operacionais. Cigarro só em locais identificados."
+    },
+    {
+      "n": 12,
+      "t": "Liberação",
+      "d": "Não libere a operação de equipamentos sem reinstalar as proteções das partes móveis."
+    }
+  ],
+  "aniversariantes": {
+    "mes": 11,
+    "titulo": "Aniversariantes de novembro",
+    "lista": []
+  },
+  "campanha": {
+    "etiqueta": "Eleição CIPAMIN · Gestão 2026/2027",
+    "titulo": "Convite: eleição da <em>CIPAMIN</em>",
+    "texto": "Convidamos todos os colaboradores da JLO Engenharia e Construções a participarem do processo eleitoral. Sua participação é fundamental para fortalecer a representatividade dos colaboradores. Participe!",
+    "datas": [
+      {
+        "quando": "24/11 a 04/12",
+        "o": "Inscrições, em horário administrativo"
+      },
+      {
+        "quando": "09/12",
+        "o": "Eleição, das 07:30 às 15:30"
+      },
+      {
+        "quando": "Local",
+        "o": "Inscrições no Escritório do Contrato da Recuperação Estrutural"
+      }
+    ]
+  },
+  "emergencia": [
+    {
+      "nome": "Ramal de emergência",
+      "tel": "9999"
+    },
+    {
+      "nome": "SAMU",
+      "tel": "192"
+    },
+    {
+      "nome": "Corpo de Bombeiros",
+      "tel": "193"
+    }
+  ],
+  "tecnicos": [],
+  "pare": {
+    "pergunta": "Eu avaliei o risco <em>antes</em> de começar?",
+    "sub": "Se tiver dúvida, pare e converse com sua liderança."
+  },
+  "duracoes": [
+    8,
+    14,
+    16,
+    16,
+    30,
+    20,
+    16,
+    20,
+    14,
+    16,
+    16,
+    10,
+    14,
+    12
+  ],
+  "ultimoAcidente": "2026-05-22",
+  "recordeDias": 0,
+  "metaDias": 365,
+  "inicioContrato": "2026-05-22"
+}

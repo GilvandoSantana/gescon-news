@@ -1,0 +1,46 @@
+name: Vídeo diário da TV
+
+on:
+  schedule:
+    - cron: "0 21 * * *"   # 18h em Fortaleza: monta o vídeo do dia seguinte
+  workflow_dispatch:
+    inputs:
+      dia:
+        description: "Data do vídeo (AAAA-MM-DD). Vazio = amanhã."
+        required: false
+
+jobs:
+  video:
+    runs-on: ubuntu-latest
+    env:
+      YT_REFRESH_TOKEN: ${{ secrets.YT_REFRESH_TOKEN }}
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 20 }
+      - run: npm install
+      - run: npx playwright install --with-deps chromium
+      - run: sudo apt-get install -y ffmpeg
+      - name: Gerar vídeo
+        env:
+          TV_FEED_TOKEN: ${{ secrets.TV_FEED_TOKEN }}
+          NEWS_URL: ${{ secrets.NEWS_URL }}
+          NEWS_TOKEN: ${{ secrets.NEWS_TOKEN }}
+          DIA: ${{ github.event.inputs.dia }}
+        run: |
+          if [ -z "$DIA" ]; then DIA=$(TZ=America/Fortaleza date -d "+1 day" +%F); fi
+          node scripts/build-day.mjs "$DIA"
+          echo "DIA=$DIA" >> "$GITHUB_ENV"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: tv-${{ env.DIA }}
+          path: out/tv_*.mp4
+          retention-days: 14
+      - name: Postar no YouTube
+        if: ${{ env.YT_REFRESH_TOKEN != '' }}
+        env:
+          YT_CLIENT_ID: ${{ secrets.YT_CLIENT_ID }}
+          YT_CLIENT_SECRET: ${{ secrets.YT_CLIENT_SECRET }}
+          YT_REFRESH_TOKEN: ${{ secrets.YT_REFRESH_TOKEN }}
+        run: node scripts/postar-youtube.mjs "$DIA"

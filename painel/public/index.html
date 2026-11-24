@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>GesCon News</title>
+<style>
+:root{--bg:#0b1220;--card:#121b2e;--line:#243350;--txt:#eaf0fa;--mut:#93a4c3;--ac:#4f8cff;--ok:#2fbf71;--err:#ef5350}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--txt);font:16px/1.4 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+header{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--line);position:sticky;top:0;background:var(--bg);z-index:5}
+header b{font-size:18px}header span{color:var(--mut);font-size:13px}
+nav{display:flex;gap:6px;padding:10px 12px;overflow-x:auto}
+nav button{flex:none;background:var(--card);color:var(--txt);border:1px solid var(--line);border-radius:999px;padding:8px 14px;font-size:14px}
+nav button.on{background:var(--ac);border-color:var(--ac)}
+main{max-width:760px;margin:0 auto;padding:8px 14px 60px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px;margin:10px 0}
+label{display:block;font-size:13px;color:var(--mut);margin:12px 0 4px}
+input,textarea{width:100%;background:#0d1627;color:var(--txt);border:1px solid var(--line);border-radius:8px;padding:10px;font:inherit}
+textarea{min-height:92px;resize:vertical}
+button.b{background:var(--ac);color:#fff;border:0;border-radius:8px;padding:11px 16px;font-size:15px;margin:12px 8px 0 0}
+button.g{background:transparent;color:var(--txt);border:1px solid var(--line)}button.r{background:var(--err)}
+.row{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line)}
+.row:last-child{border:0}.row small{color:var(--mut);display:block}.tag{font-size:12px;border-radius:6px;padding:2px 8px;background:#1d2b47;color:var(--mut)}
+.tag.ok{background:#13351f;color:var(--ok)}.msg{margin-top:10px;font-size:14px}.msg.e{color:var(--err)}.msg.k{color:var(--ok)}
+.dica{color:var(--mut);font-size:13px}
+</style>
+</head>
+<body>
+<header><b>GesCon News</b><span id="quem"></span></header>
+<nav id="nav" hidden></nav>
+<main id="app">Carregando…</main>
+<script>
+const $=(s)=>document.querySelector(s);
+const esc=(s)=>String(s??"").replace(/[&<>"']/g,(c)=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+async function api(caminho,metodo="GET",corpo){
+  const r=await fetch("/api/"+caminho,{method:metodo,headers:{"content-type":"application/json"},body:corpo?JSON.stringify(corpo):undefined});
+  const j=await r.json().catch(()=>({}));
+  if(!r.ok){const e=new Error(j.erro||"Erro "+r.status);e.status=r.status;throw e;}
+  return j;
+}
+const linhas=(t)=>String(t||"").split("\n").map((x)=>x.trim()).filter(Boolean);
+const hojeFortaleza=()=>new Date(Date.now()-3*36e5).toISOString().slice(0,10);
+const somaDias=(iso,n)=>{const d=new Date(iso+"T12:00:00Z");d.setUTCDate(d.getUTCDate()+n);return d.toISOString().slice(0,10)};
+const SEM=["dom","seg","ter","qua","qui","sex","sáb"];
+const fmt=(iso)=>`${SEM[new Date(iso+"T12:00:00Z").getUTCDay()]} ${iso.slice(8)}/${iso.slice(5,7)}`;
+let eu=null,aba="dds";
+function msg(el,t,ok){el.className="msg "+(ok?"k":"e");el.textContent=t}
+
+async function iniciar(){
+  const e=await api("estado");
+  if(e.precisaCriarPrimeiro) return telaPrimeiro();
+  if(!e.eu) return telaEntrar();
+  eu=e.eu;$("#quem").textContent=eu.usuario;montaNav();mostra();
+}
+function telaPrimeiro(){
+  $("#nav").hidden=true;
+  $("#app").innerHTML=`<div class="card"><h3>Primeiro acesso</h3><p class="dica">Crie o usuário administrador. Depois você cadastra os outros técnicos.</p>
+  <label>Usuário</label><input id="u" autocapitalize="none" autocomplete="username"><label>Senha (mínimo 8 caracteres)</label><input id="s" type="password" autocomplete="new-password">
+  <button class="b" id="ok">Criar e entrar</button><div class="msg" id="m"></div></div>`;
+  $("#ok").onclick=async()=>{try{await api("primeiro-acesso","POST",{usuario:$("#u").value,senha:$("#s").value});iniciar()}catch(x){msg($("#m"),x.message)}};
+}
+function telaEntrar(){
+  $("#nav").hidden=true;
+  $("#app").innerHTML=`<div class="card"><h3>Entrar</h3><label>Usuário</label><input id="u" autocapitalize="none" autocomplete="username"><label>Senha</label><input id="s" type="password" autocomplete="current-password">
+  <button class="b" id="ok">Entrar</button><div class="msg" id="m"></div></div>`;
+  const go=async()=>{try{await api("entrar","POST",{usuario:$("#u").value,senha:$("#s").value});iniciar()}catch(x){msg($("#m"),x.message)}};
+  $("#ok").onclick=go;$("#s").onkeydown=(k)=>{if(k.key==="Enter")go()};
+}
+function montaNav(){
+  const abas=[["dds","DDS"],["mensal","Aniversariantes"],["avisos","Campanha e emergência"]];
+  if(eu.papel==="admin")abas.push(["usuarios","Usuários"]);
+  abas.push(["sair","Sair"]);
+  const n=$("#nav");n.hidden=false;
+  n.innerHTML=abas.map(([k,t])=>`<button data-k="${k}" class="${k===aba?"on":""}">${t}</button>`).join("");
+  n.onclick=async(ev)=>{const k=ev.target.dataset.k;if(!k)return;if(k==="sair"){await api("sair","POST");eu=null;return iniciar()}aba=k;montaNav();mostra()};
+}
+function mostra(){({dds:abaDds,mensal:abaMensal,avisos:abaAvisos,usuarios:abaUsuarios})[aba]()}
+
+async function abaDds(){
+  const hoje=hojeFortaleza(),ate=somaDias(hoje,20);
+  const itens=await api(`dds?de=${hoje}&ate=${ate}`);
+  const por=Object.fromEntries(itens.map((i)=>[i.data,i]));
+  let h=`<p class="dica">Toque no dia para escrever ou editar o DDS. Dia sem tema não mostra as telas de DDS na TV.</p><div class="card">`;
+  for(let i=0;i<21;i++){const d=somaDias(hoje,i),x=por[d];
+    h+=`<div class="row" data-d="${d}"><div><b>${fmt(d)}</b>${i===0?' <span class="tag">hoje</span>':""}<small>${x?esc(x.tema):"sem tema"}</small></div><span class="tag ${x?"ok":""}">${x?"pronto":"vazio"}</span></div>`}
+  $("#app").innerHTML=h+"</div>";
+  $("#app").onclick=(ev)=>{const r=ev.target.closest("[data-d]");if(r)editaDds(r.dataset.d,por[r.dataset.d])};
+}
+function editaDds(d,x={}){
+  const pare=x.pare||{};
+  $("#app").onclick=null;
+  $("#app").innerHTML=`<div class="card"><h3>DDS de ${fmt(d)}</h3>
+  <label>Tema</label><input id="tema" value="${esc(x.tema)}">
+  <label>Pontos principais (um por linha)</label><textarea id="pontos">${esc((x.pontos||[]).join("\n"))}</textarea>
+  <label>Faça certo (um por linha)</label><textarea id="certo">${esc((x.certo||[]).join("\n"))}</textarea>
+  <label>Não faça (errado, um por linha)</label><textarea id="errado">${esc((x.errado||[]).join("\n"))}</textarea>
+  <label>Pare e Pense: pergunta</label><input id="pp" value="${esc(pare.pergunta)}">
+  <label>Pare e Pense: frase de baixo</label><input id="ps" value="${esc(pare.sub)}">
+  <p class="dica">Sempre ARA (nunca APR). ${x.atualizadoPor?`Última edição: ${esc(x.atualizadoPor)}.`:""}</p>
+  <button class="b" id="sv">Salvar</button><button class="b g" id="vl">Voltar</button>${x.tema?'<button class="b r" id="ap">Apagar</button>':""}<div class="msg" id="m"></div></div>`;
+  $("#vl").onclick=abaDds;
+  $("#sv").onclick=async()=>{try{await api("dds/"+d,"PUT",{tema:$("#tema").value,pontos:linhas($("#pontos").value),certo:linhas($("#certo").value),errado:linhas($("#errado").value),pare:{pergunta:$("#pp").value,sub:$("#ps").value}});msg($("#m"),"Salvo.",true);setTimeout(abaDds,600)}catch(e){msg($("#m"),e.message)}};
+  if($("#ap"))$("#ap").onclick=async()=>{if(confirm("Apagar o DDS deste dia?")){await api("dds/"+d,"DELETE");abaDds()}};
+}
+
+async function carregaCfg(c){return (await api("config/"+c)).valor}
+async function salvaCfg(c,v,m){try{await api("config/"+c,"PUT",{valor:v});msg(m,"Salvo.",true)}catch(e){msg(m,e.message)}}
+
+async function abaMensal(){
+  const v=(await carregaCfg("aniversariantes"))||{mes:new Date().getUTCMonth()+1,titulo:"",lista:[]};
+  $("#app").innerHTML=`<div class="card"><h3>Aniversariantes do mês</h3>
+  <label>Mês (1 a 12)</label><input id="mes" type="number" min="1" max="12" value="${esc(v.mes)}">
+  <label>Título do slide</label><input id="tit" value="${esc(v.titulo)}" placeholder="Aniversariantes de novembro">
+  <label>Lista (uma por linha: dia e nome. Ex.: 05 Maria Souza)</label><textarea id="lst" style="min-height:220px">${esc((v.lista||[]).map((x)=>`${x.dia} ${x.nome}`).join("\n"))}</textarea>
+  <p class="dica">A TV só mostra este slide no mês indicado.</p><button class="b" id="sv">Salvar</button><div class="msg" id="m"></div></div>`;
+  $("#sv").onclick=()=>{const lista=linhas($("#lst").value).map((l)=>{const m=l.match(/^(\d{1,2})\s+(.+)$/);return m?{dia:m[1].padStart(2,"0"),nome:m[2]}:null}).filter(Boolean);
+    salvaCfg("aniversariantes",{mes:Number($("#mes").value),titulo:$("#tit").value.trim(),lista},$("#m"))};
+}
+
+async function abaAvisos(){
+  const camp=(await carregaCfg("campanha"))||{etiqueta:"",titulo:"",texto:"",datas:[]};
+  const emg=(await carregaCfg("emergencia"))||[];const tec=(await carregaCfg("tecnicos"))||[];
+  const par=(a,k1,k2)=>(a||[]).map((x)=>`${x[k1]} | ${x[k2]}`).join("\n");
+  const ler=(t,k1,k2)=>linhas(t).map((l)=>{const i=l.lastIndexOf("|");return i<0?null:{[k1]:l.slice(0,i).trim(),[k2]:l.slice(i+1).trim()}}).filter(Boolean);
+  $("#app").innerHTML=`<div class="card"><h3>Campanha</h3>
+  <label>Etiqueta</label><input id="ce" value="${esc(camp.etiqueta)}"><label>Título (pode usar &lt;em&gt;destaque&lt;/em&gt;)</label><input id="ct" value="${esc(camp.titulo)}">
+  <label>Texto</label><textarea id="cx">${esc(camp.texto)}</textarea><label>Datas (uma por linha: quando | o que)</label><textarea id="cd">${esc(par(camp.datas,"quando","o"))}</textarea>
+  <button class="b" id="s1">Salvar campanha</button><div class="msg" id="m1"></div></div>
+  <div class="card"><h3>Emergência</h3><label>Números (nome | telefone)</label><textarea id="em">${esc(par(emg,"nome","tel"))}</textarea>
+  <label>Técnicos de segurança (nome | telefone)</label><textarea id="tc">${esc(par(tec,"nome","tel"))}</textarea>
+  <button class="b" id="s2">Salvar emergência</button><div class="msg" id="m2"></div></div>`;
+  $("#s1").onclick=()=>salvaCfg("campanha",{etiqueta:$("#ce").value.trim(),titulo:$("#ct").value.trim(),texto:$("#cx").value.trim(),datas:ler($("#cd").value,"quando","o")},$("#m1"));
+  $("#s2").onclick=async()=>{await salvaCfg("emergencia",ler($("#em").value,"nome","tel"),$("#m2"));await salvaCfg("tecnicos",ler($("#tc").value,"nome","tel"),$("#m2"))};
+}
+
+async function abaUsuarios(){
+  const us=await api("usuarios");
+  $("#app").innerHTML=`<div class="card"><h3>Usuários</h3>${us.map((u)=>`<div class="row"><div><b>${esc(u.usuario)}</b><small>${u.papel==="admin"?"administrador":"editor"}</small></div>${u.usuario===eu.usuario?"":`<button class="b r" style="margin:0" data-del="${esc(u.usuario)}">Apagar</button>`}</div>`).join("")}</div>
+  <div class="card"><h3>Novo usuário</h3><label>Usuário</label><input id="nu" autocapitalize="none"><label>Senha (mínimo 8 caracteres)</label><input id="ns" type="password" autocomplete="new-password">
+  <label>Papel</label><select id="np" style="width:100%;padding:10px;border-radius:8px;background:#0d1627;color:#eaf0fa;border:1px solid #243350"><option value="editor">Editor</option><option value="admin">Administrador</option></select>
+  <button class="b" id="cr">Criar</button><div class="msg" id="m"></div></div>`;
+  $("#cr").onclick=async()=>{try{await api("usuarios","POST",{usuario:$("#nu").value,senha:$("#ns").value,papel:$("#np").value});abaUsuarios()}catch(e){msg($("#m"),e.message)}};
+  $("#app").onclick=async(ev)=>{const d=ev.target.dataset.del;if(d&&confirm("Apagar o usuário "+d+"?")){await api("usuarios/"+encodeURIComponent(d),"DELETE");abaUsuarios()}};
+}
+window.addEventListener("unhandledrejection",(e)=>{if(e.reason&&e.reason.status===401)iniciar()});
+iniciar();
+</script>
+</body>
+</html>

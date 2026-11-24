@@ -1,0 +1,8 @@
+name = "gescon-news"
+compatibility_date = "2024-11-01"
+pages_build_output_dir = "public"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "gescon-news"
+database_id = "f82981b3-0fa7-497a-8972-fba7aaec04fa"

@@ -1,0 +1,7 @@
+{
+  "name": "gescon-news",
+  "private": true,
+  "type": "module",
+  "scripts": { "video": "node scripts/build-day.mjs" },
+  "dependencies": { "playwright": "^1.48.0" }
+}
