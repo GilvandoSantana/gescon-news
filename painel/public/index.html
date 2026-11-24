@@ -70,12 +70,13 @@ function telaEntrar(){
 function montaNav(){
   const abas=[["dds","DDS"],["mensal","Aniversariantes"],["avisos","Campanha e emergência"]];
   if(eu.papel==="admin")abas.push(["usuarios","Usuários"]);
+  abas.push(["email","Meu e-mail"]);
   abas.push(["sair","Sair"]);
   const n=$("#nav");n.hidden=false;
   n.innerHTML=abas.map(([k,t])=>`<button data-k="${k}" class="${k===aba?"on":""}">${t}</button>`).join("");
   n.onclick=async(ev)=>{const k=ev.target.dataset.k;if(!k)return;if(k==="sair"){await api("sair","POST");eu=null;return iniciar()}aba=k;montaNav();mostra()};
 }
-function mostra(){({dds:abaDds,mensal:abaMensal,avisos:abaAvisos,usuarios:abaUsuarios})[aba]()}
+function mostra(){({dds:abaDds,mensal:abaMensal,avisos:abaAvisos,usuarios:abaUsuarios,email:abaEmail})[aba]()}
 
 async function abaDds(){
   const hoje=hojeFortaleza(),ate=somaDias(hoje,20);
@@ -136,12 +137,17 @@ async function abaAvisos(){
 
 async function abaUsuarios(){
   const us=await api("usuarios");
-  $("#app").innerHTML=`<div class="card"><h3>Usuários</h3>${us.map((u)=>`<div class="row"><div><b>${esc(u.usuario)}</b><small>${u.papel==="admin"?"administrador":"editor"}</small></div>${u.usuario===eu.usuario?"":`<button class="b r" style="margin:0" data-del="${esc(u.usuario)}">Apagar</button>`}</div>`).join("")}</div>
+  $("#app").innerHTML=`<div class="card"><h3>Usuários</h3>${us.map((u)=>`<div class="row"><div><b>${esc(u.usuario)}</b><small>${u.papel==="admin"?"administrador":"editor"} · ${u.email?esc(u.email):"sem e-mail"}</small></div><button class="b" style="margin:0 6px 0 0" data-em="${esc(u.usuario)}" data-v="${esc(u.email||"")}">E-mail</button>${u.usuario===eu.usuario?"":`<button class="b r" style="margin:0" data-del="${esc(u.usuario)}">Apagar</button>`}</div>`).join("")}</div>
   <div class="card"><h3>Novo usuário</h3><label>Usuário</label><input id="nu" autocapitalize="none"><label>Senha (mínimo 8 caracteres)</label><input id="ns" type="password" autocomplete="new-password">
-  <label>Papel</label><select id="np" style="width:100%;padding:10px;border-radius:8px;background:#0d1627;color:#eaf0fa;border:1px solid #243350"><option value="editor">Editor</option><option value="admin">Administrador</option></select>
+  <label>E-mail para o aviso do vídeo (opcional)</label><input id="ne" type="email" autocapitalize="none"><label>Papel</label><select id="np" style="width:100%;padding:10px;border-radius:8px;background:#0d1627;color:#eaf0fa;border:1px solid #243350"><option value="editor">Editor</option><option value="admin">Administrador</option></select>
   <button class="b" id="cr">Criar</button><div class="msg" id="m"></div></div>`;
-  $("#cr").onclick=async()=>{try{await api("usuarios","POST",{usuario:$("#nu").value,senha:$("#ns").value,papel:$("#np").value});abaUsuarios()}catch(e){msg($("#m"),e.message)}};
-  $("#app").onclick=async(ev)=>{const d=ev.target.dataset.del;if(d&&confirm("Apagar o usuário "+d+"?")){await api("usuarios/"+encodeURIComponent(d),"DELETE");abaUsuarios()}};
+  $("#cr").onclick=async()=>{try{await api("usuarios","POST",{usuario:$("#nu").value,senha:$("#ns").value,papel:$("#np").value,email:$("#ne").value});abaUsuarios()}catch(e){msg($("#m"),e.message)}};
+  $("#app").onclick=async(ev)=>{const em=ev.target.dataset.em;if(em){const v=prompt("E-mail de "+em+" (vazio remove):",ev.target.dataset.v);if(v!==null){try{await api("usuarios/"+encodeURIComponent(em)+"/email","POST",{email:v});abaUsuarios()}catch(e){alert(e.message)}}return}const d=ev.target.dataset.del;if(d&&confirm("Apagar o usuário "+d+"?")){await api("usuarios/"+encodeURIComponent(d),"DELETE");abaUsuarios()}};
+}
+async function abaEmail(){
+  const r=await api("meu-email");
+  $("#app").innerHTML=`<div class="card"><h3>Aviso por e-mail</h3><small>Quando o vídeo do dia for postado no YouTube, você recebe um e-mail com o link.</small><label>Seu e-mail</label><input id="em" type="email" autocapitalize="none" value="${esc(r.email)}"><button class="b" id="sv">Salvar</button><div class="msg" id="m"></div></div>`;
+  $("#sv").onclick=async()=>{try{await api("meu-email","POST",{email:$("#em").value});msg($("#m"),"Salvo.",true)}catch(e){msg($("#m"),e.message)}};
 }
 window.addEventListener("unhandledrejection",(e)=>{if(e.reason&&e.reason.status===401)iniciar()});
 iniciar();

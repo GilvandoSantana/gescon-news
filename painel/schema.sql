@@ -4,6 +4,7 @@ CREATE TABLE IF NOT EXISTS usuarios (
   senha_hash TEXT NOT NULL,
   senha_salt TEXT NOT NULL,
   papel TEXT NOT NULL DEFAULT 'editor',
+  email TEXT,
   criado_em TEXT NOT NULL
 );
 CREATE TABLE IF NOT EXISTS sessoes (

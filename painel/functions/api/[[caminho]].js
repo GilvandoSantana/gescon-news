@@ -46,6 +46,9 @@ function limparDds(b) {
   };
 }
 
+const EMAIL = /^[^\s@]{1,64}@[^\s@]{1,190}\.[^\s@]{2,}$/;
+const limparEmail = (v) => { const e = String(v ?? "").trim().toLowerCase(); return e === "" ? "" : (EMAIL.test(e) && e.length <= 254 ? e : null); };
+
 const CHAVES = new Set(["aniversariantes", "campanha", "emergencia", "tecnicos"]);
 
 export async function onRequest({ request, env, params }) {
@@ -64,7 +67,8 @@ export async function onRequest({ request, env, params }) {
     for (const r of (await env.DB.prepare("SELECT data, conteudo FROM dds").all()).results) dds[r.data] = JSON.parse(r.conteudo);
     const cfg = {};
     for (const r of (await env.DB.prepare("SELECT chave, valor FROM config").all()).results) cfg[r.chave] = JSON.parse(r.valor);
-    return json({ dds, ...cfg });
+    const emails = (await env.DB.prepare("SELECT email FROM usuarios WHERE email IS NOT NULL AND email != ''").all()).results.map((r) => r.email);
+    return json({ dds, ...cfg, emails });
   }
 
   if (rota === "estado" && metodo === "GET") {
@@ -103,6 +107,16 @@ export async function onRequest({ request, env, params }) {
   const eu = await usuarioLogado(env, request);
   if (!eu) return erro("Entre para continuar.", 401);
 
+  if (rota === "meu-email") {
+    if (metodo === "GET") return json({ email: (await env.DB.prepare("SELECT email FROM usuarios WHERE id = ?").bind(eu.id).first())?.email || "" });
+    if (metodo === "POST") {
+      const e = limparEmail((await corpo()).email);
+      if (e === null) return erro("E-mail inválido.");
+      await env.DB.prepare("UPDATE usuarios SET email = ? WHERE id = ?").bind(e, eu.id).run();
+      return json({ ok: true });
+    }
+  }
+
   if (rota === "dds" && metodo === "GET") {
     const de = url.searchParams.get("de") || "0000-00-00", ate = url.searchParams.get("ate") || "9999-99-99";
     const rs = await env.DB.prepare("SELECT data, conteudo, atualizado_por, atualizado_em FROM dds WHERE data BETWEEN ? AND ? ORDER BY data").bind(de, ate).all();
@@ -132,18 +146,27 @@ export async function onRequest({ request, env, params }) {
 
   if (rota === "usuarios") {
     if (eu.papel !== "admin") return erro("Só o administrador gerencia usuários.", 403);
-    if (metodo === "GET") return json((await env.DB.prepare("SELECT usuario, papel, criado_em FROM usuarios ORDER BY usuario").all()).results);
+    if (metodo === "GET") return json((await env.DB.prepare("SELECT usuario, papel, email, criado_em FROM usuarios ORDER BY usuario").all()).results);
     if (metodo === "POST") {
       const b = await corpo();
       const usuario = String(b.usuario || "").trim().toLowerCase(), senha = String(b.senha || "");
       if (!/^[a-z0-9._-]{3,30}$/.test(usuario)) return erro("Usuário: 3 a 30 letras minúsculas, números, ponto ou traço.");
       if (senha.length < 8) return erro("A senha precisa ter pelo menos 8 caracteres.");
+      const email = limparEmail(b.email);
+      if (email === null) return erro("E-mail inválido.");
       const salt = rand(16);
       try {
-        await env.DB.prepare("INSERT INTO usuarios (usuario, senha_hash, senha_salt, papel, criado_em) VALUES (?, ?, ?, ?, ?)").bind(usuario, await hashSenha(senha, salt), salt, b.papel === "admin" ? "admin" : "editor", agora()).run();
+        await env.DB.prepare("INSERT INTO usuarios (usuario, senha_hash, senha_salt, papel, email, criado_em) VALUES (?, ?, ?, ?, ?, ?)").bind(usuario, await hashSenha(senha, salt), salt, b.papel === "admin" ? "admin" : "editor", email, agora()).run();
       } catch { return erro("Esse usuário já existe."); }
       return json({ ok: true });
     }
+  }
+  if (partes[0] === "usuarios" && partes[1] && partes[2] === "email" && metodo === "POST") {
+    if (eu.papel !== "admin") return erro("Só o administrador gerencia usuários.", 403);
+    const e = limparEmail((await corpo()).email);
+    if (e === null) return erro("E-mail inválido.");
+    await env.DB.prepare("UPDATE usuarios SET email = ? WHERE usuario = ?").bind(e, partes[1]).run();
+    return json({ ok: true });
   }
   if (partes[0] === "usuarios" && partes[1] && metodo === "DELETE") {
     if (eu.papel !== "admin") return erro("Só o administrador gerencia usuários.", 403);
