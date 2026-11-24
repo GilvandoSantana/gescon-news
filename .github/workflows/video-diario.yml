@@ -44,3 +44,18 @@ jobs:
           YT_CLIENT_SECRET: ${{ secrets.YT_CLIENT_SECRET }}
           YT_REFRESH_TOKEN: ${{ secrets.YT_REFRESH_TOKEN }}
         run: node scripts/postar-youtube.mjs "$DIA"
+      - name: Avisar por e-mail (postado)
+        if: ${{ success() && env.YT_REFRESH_TOKEN != '' }}
+        env:
+          SMTP_USER: ${{ secrets.SMTP_USER }}
+          SMTP_PASS: ${{ secrets.SMTP_PASS }}
+          NEWS_URL: ${{ secrets.NEWS_URL }}
+          NEWS_TOKEN: ${{ secrets.NEWS_TOKEN }}
+        run: node scripts/avisar-email.mjs ok "$DIA"
+      - name: Avisar por e-mail (falhou)
+        if: ${{ failure() }}
+        env:
+          SMTP_USER: ${{ secrets.SMTP_USER }}
+          SMTP_PASS: ${{ secrets.SMTP_PASS }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: node scripts/avisar-email.mjs erro "${DIA:-$(TZ=America/Fortaleza date -d '+1 day' +%F)}"

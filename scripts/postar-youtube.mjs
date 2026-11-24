@@ -1,7 +1,7 @@
 // Sobe o vídeo do dia no YouTube (não listado) e coloca numa playlist nova com a data.
 // Uso: node scripts/postar-youtube.mjs AAAA-MM-DD
 // Variáveis: YT_CLIENT_ID, YT_CLIENT_SECRET, YT_REFRESH_TOKEN
-import { readFile, stat } from "node:fs/promises";
+import { readFile, stat, writeFile } from "node:fs/promises";
 
 const dia = process.argv[2];
 if (!/^\d{4}-\d{2}-\d{2}$/.test(dia ?? "")) { console.error("Informe a data: node scripts/postar-youtube.mjs 2026-11-24"); process.exit(1); }
@@ -80,3 +80,4 @@ for (let t = 1; t <= 5; t++) {
 }
 console.log(`Vídeo https://youtu.be/${video.id}`);
 console.log(`Playlist https://www.youtube.com/playlist?list=${playlist.id}`);
+await writeFile("out/youtube.json", JSON.stringify({ video: `https://youtu.be/${video.id}`, playlist: `https://www.youtube.com/playlist?list=${playlist.id}` }));
