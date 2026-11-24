@@ -2,7 +2,7 @@ name: Vídeo diário da TV
 
 on:
   schedule:
-    - cron: "0 21 * * *"   # 18h em Fortaleza: monta o vídeo do dia seguinte
+    - cron: "30 23 * * *"   # 20h30 em Fortaleza (dados do GesCon só valem após as 20h); vídeo do dia seguinte pronto ~21h
   workflow_dispatch:
     inputs:
       dia:
