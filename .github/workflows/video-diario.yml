@@ -47,7 +47,7 @@ jobs:
       - name: Avisar por e-mail (postado)
         if: ${{ success() && env.YT_REFRESH_TOKEN != '' }}
         env:
-          SMTP_USER: ${{ secrets.SMTP_USER }}
+          SMTP_USER: ${{ secrets.SMTP_USER || vars.SMTP_USER }}
           SMTP_PASS: ${{ secrets.SMTP_PASS }}
           NEWS_URL: ${{ secrets.NEWS_URL }}
           NEWS_TOKEN: ${{ secrets.NEWS_TOKEN }}
@@ -55,7 +55,7 @@ jobs:
       - name: Avisar por e-mail (falhou)
         if: ${{ failure() }}
         env:
-          SMTP_USER: ${{ secrets.SMTP_USER }}
+          SMTP_USER: ${{ secrets.SMTP_USER || vars.SMTP_USER }}
           SMTP_PASS: ${{ secrets.SMTP_PASS }}
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: node scripts/avisar-email.mjs erro "${DIA:-$(TZ=America/Fortaleza date -d '+1 day' +%F)}"
