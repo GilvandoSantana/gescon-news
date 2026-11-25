@@ -6,7 +6,11 @@ import nodemailer from "nodemailer";
 
 const [modo, dia] = process.argv.slice(2);
 const { SMTP_USER, SMTP_PASS, NEWS_URL, NEWS_TOKEN, RUN_URL } = process.env;
-if (!SMTP_USER || !SMTP_PASS) { console.log("E-mail não configurado (SMTP_USER/SMTP_PASS); nada enviado."); process.exit(0); }
+if (!SMTP_USER || !SMTP_PASS) {
+  const falta = [!SMTP_USER && "SMTP_USER (e-mail remetente)", !SMTP_PASS && "SMTP_PASS (senha de app)"].filter(Boolean).join(" e ");
+  console.log(`E-mail não configurado: falta ${falta} em Settings > Secrets > Actions; nada enviado.`);
+  process.exit(0);
+}
 
 const [y, m, d] = (dia || "").split("-");
 const data = y ? `${d}/${m}/${y}` : "";
